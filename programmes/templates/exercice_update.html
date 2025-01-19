@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Modifier exercice</title>
+</head>
+<body>
+    <h1>Modifier exercice</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Enregistrer</button>
+        <a href="{% url 'Exercice_list' %}"><button type="button">Annuler</button></a>
+    </form>
+</body>
+</html>

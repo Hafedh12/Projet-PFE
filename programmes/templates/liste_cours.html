@@ -1,0 +1,249 @@
+{% extends 'index.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Cours</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        {% block style_nav %}
+            {{ block.super }}
+        {% endblock %}
+        {% block style_header %}
+            header{
+                width: 70%;
+                margin: 20px 15% 10px 15%;
+                text-align: center;
+                display: flex;
+                flex-wrap: wrap;
+                left: 10px;
+
+            }
+                    .button {
+          /* Variables */
+          --button_radius: 0.75em;
+          --button_color: #e8e8e8;
+          --button_outline_color: #000000;
+          font-size: 17px;
+          font-weight: bold;
+          border: none;
+          border-radius: var(--button_radius);
+          background: var(--button_outline_color);
+                    position: relative;
+        left: 45%;
+                    margin-top: 20px;
+
+        }
+
+        .button_top {
+          display: block;
+          box-sizing: border-box;
+          border: 2px solid var(--button_outline_color);
+          border-radius: var(--button_radius);
+          padding: 0.75em 1.5em;
+          background: var(--button_color);
+          color: var(--button_outline_color);
+          transform: translateY(-0.2em);
+          transition: transform 0.1s ease;
+        }
+
+        button:hover .button_top {
+          /* Pull the button upwards when hovered */
+          transform: translateY(-0.33em);
+        }
+
+        button:active .button_top {
+          /* Push the button downwards when pressed */
+          transform: translateY(0);
+        }
+        .card{
+        margin-right: 30px;
+        margin-bottom: 15px;
+        width: 150px;
+        margin-left: 20px;
+        }
+        .nomch {
+            height: 170px;
+            box-sizing: border-box;
+            width: 150px;
+            background: rgba(74, 130, 140, 0.62);
+            border: 5px solid rgba(220, 137, 190, 0.98);
+            box-shadow: 12px 17px 51px rgba(217, 103, 163, 0.84);
+            backdrop-filter: blur(6px);
+            border-radius: 17px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            font-weight: bolder;
+            color: #24252a;
+            font-size: 20px;
+        font-family: Century;
+        }
+
+                    .nomch:hover {
+          border: 1px solid #479d9a;
+          transform: scale(1.05);
+                    background-color: #aec5fa;
+        }
+
+        .nomch:active {
+          transform: scale(0.95) rotateZ(1.7deg);
+        }
+                    .btn {
+                        box-shadow: 12px 17px 51px rgba(217, 103, 163, 0.84);
+
+            background-color: #c0cde5; /* Couleur de fond verte */
+            border: none; /* Pas de bordure */
+            color: black; /* Couleur du texte en blanc */
+            text-align: center; /* Alignement du texte au centre */
+            text-decoration: none; /* Pas de soulignement */
+            display: inline-block; /* Affichage en ligne */
+            cursor: pointer; /* Curseur en forme de main */
+            border-radius: 4px; /* Coins arrondis */
+            transition: background-color 0.3s ease; /* Transition de couleur de fond */
+                    height: 30px;
+                    width: 68px;
+                    margin-left: 2px;
+        }
+
+        .btn:hover {
+            background-color: #96abd9; /* Couleur de fond plus foncée au survol */
+        }
+                    #voice-command-btn {
+            background-color: #adc0d3;
+            border: 0.25px solid blueviolet;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 16.2em;
+            margin-left: 50%;
+            cursor: pointer;
+            border-radius: 50%;
+            padding: 5px 5px;
+            position: fixed;
+        }
+        #voice-command-btn i {
+            font-size: 55px;
+            color: rgba(59, 30, 101, 0.8);
+        }
+        #voice-command-btn:hover {
+            background-color: rgba(52, 213, 219, 0.96);
+        }
+                {% endblock %}
+    </style>
+</head>
+<body>
+{% block header %}
+     {% if request.user.is_authenticated and request.user.enseignant %}
+        <a href="{% url 'cours_create' %}">
+            <button class="button">
+                <span class="button_top">Ajouter un cours</span>
+            </button>
+        </a>
+    {% endif %}
+<header>
+    {% for Cours in Courss %}
+        {% if request.user.is_authenticated %}
+            {% if request.user.enseignant and Cours.créer_par == request.user %}
+                <div class="card">
+                    <a href="{% url 'detail_cours' slug=Cours.slug %}" style="text-decoration: none; ">
+                        <div class="nomch">
+                            {{ Cours.nom_cours }}
+                        </div>
+                    </a><br>
+                    <a href="{% url 'cours_update' slug=Cours.slug %}">
+                        <button type="button" class="btn" id="modf">Modifier</button>
+                    </a>
+                    <a href="{% url 'cours_delete' slug=Cours.slug %}" id="sup">
+                        <button type="button" class="btn">Supprimer</button>
+                    </a>
+                </div>
+            {% elif not request.user.enseignant %}
+                <div class="card">
+                    <a href="{% url 'detail_cours' slug=Cours.slug %}" style="text-decoration: none; ">
+                        <div class="nomch">
+                            {{ Cours.nom_cours }}
+                        </div>
+                    </a><br>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</header>
+    {% if request.user.eleve %}
+    <button id="voice-command-btn">
+        <i class="fas fa-microphone"></i>
+    </button>
+    {% endif %}
+    <script>
+        document.getElementById('voice-command-btn').addEventListener('click', function() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'fr-FR';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = function() {
+                    console.log('Reconnaissance vocale activée');
+                };
+
+                recognition.onresult = function(event) {
+                    const command = event.results[0][0].transcript.toLowerCase();
+                    console.log('Commande vocale reçue:', command);
+                    handleVoiceCommand(command);
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Erreur de reconnaissance vocale:', event.error);
+                };
+
+                recognition.onend = function() {
+                    console.log('Reconnaissance vocale terminée');
+                };
+
+                recognition.start();
+            } else {
+                alert('La reconnaissance vocale n\'est pas supportée par votre navigateur.');
+            }
+        });
+
+        function handleVoiceCommand(command) {
+            const courses = {{ course_dict|safe }};
+            const courseKey = Object.keys(courses).find(key => command.includes(key));
+            if (courseKey) {
+                window.location.href = courses[courseKey];
+            } else if (command.includes('retour')) {
+            console.log('retour');
+            window.location.href = "{% url 'home' %}";
+            }else {
+                alert('Commande non reconnue. Essayez "inscription", "accueil", "login", "profile", ou le nom d\'un cours.');
+            }
+        }
+    </script>
+{% endblock %}
+{% block footer %}
+    {{ block.super }}
+     {% if request.user.is_authenticated and request.user.eleve %}
+    <script type="text/javascript">
+    (function(d, m){
+        var kommunicateSettings =
+            {"appId":"139a77315b1e591fc0beb91f92a84b29","popupWidget":true,"automaticChatOpenOnNavigation":true,
+            "voiceOutput":true,"voiceName":"Google Deutsch", "voiceRate":1,"language": "fr-FR",
+    };
+        var s = document.createElement("script"); s.type = "text/javascript"; s.async = true;
+        s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
+        var h = document.getElementsByTagName("head")[0]; h.appendChild(s);
+        window.kommunicate = m; m._globals = kommunicateSettings;
+    })(document, window.kommunicate || {});
+    </script>
+{% endif %}
+{% endblock %}
+</body>
+</html>

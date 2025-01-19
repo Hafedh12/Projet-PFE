@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mettre à jour le profil</title>
+    <style>
+        /* Style pour le formulaire */
+        form {
+            max-width: 400px;
+            margin: 0 auto; /* Centre le formulaire horizontalement */
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        /* Style pour les champs de saisie */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"],
+        input[type="file"],
+        button {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #2563eb;
+            border-radius: 4px;
+        }
+
+        /* Style pour les boutons */
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        button[type="button"] {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="button"]:hover {
+            background-color: #c82333;
+        }
+
+        /* Style pour les messages d'erreur */
+        .errorlist {
+            color: red;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Style pour les étiquettes */
+        label {
+            font-weight: bold;
+        }
+
+        body {
+            background-image: url('../../media/Image/tx.png');
+            font-family: Arial, sans-serif;
+            background-size: cover; /* Ajuste l'image pour couvrir tout le fond */
+            background-repeat: no-repeat;
+            background-position: center; /* Centre l'image */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Centre le formulaire verticalement */
+        }
+
+        /* Style pour le conteneur du formulaire */
+        .form-container {
+            width: 400px;
+            margin: 10px auto; /* Centre le formulaire verticalement et horizontalement */
+            background-color: #fff;
+            border: #2563eb solid;
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        /* Style pour les champs alignés côte à côte */
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        /* Style pour les colonnes */
+        .col {
+            flex: 1;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Mettre à jour le profil</h1>
+        {% if user_form and profile_form %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset id="fieldset1">
+                <legend>Informations personnelles</legend>
+                <div class="form-row">
+                    <div class="col">
+                        {{ user_form.first_name.label_tag }}
+                        {{ user_form.first_name }}
+                        {{ user_form.first_name.errors }}
+                    </div>
+                    <div class="col">
+                        {{ user_form.last_name.label_tag }}
+                        {{ user_form.last_name }}
+                        {{ user_form.last_name.errors }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        {{ profile_form.profile_pic.label_tag }}
+                        {{ profile_form.profile_pic }}
+                        {{ profile_form.profile_pic.errors }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        {{ user_form.email.label_tag }}
+                        {{ user_form.email }}
+                        {{ user_form.email.errors }}
+                    </div>
+                </div>
+                     {% if request.user.eleve %}
+                        <div class="form-row">
+                            <div class="col">
+                                {{ profile_form.date_de_naissance.label_tag }}
+                                {{ profile_form.date_de_naissance }}
+                                {{ profile_form.date_de_naissance.errors }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                {{ profile_form.anomalie.label_tag }}
+                                {{ profile_form.anomalie }}
+                                {{ profile_form.anomalie.errors }}
+                            </div>
+                        </div>
+                {% else %}
+                    <div class="form-row">
+                            <div class="col">
+                                {{ profile_form.numero_telephone.label_tag }}
+                                {{ profile_form.numero_telephone }}
+                                {{ profile_form.numero_telephone.errors }}
+                            </div>
+                        </div>
+                {% endif %}
+            </fieldset>
+
+            <fieldset id="fieldset2">
+                <legend>Informations supplémentaires</legend>
+                <div class="form-row">
+                    <div class="col">
+                        {{ user_form.username.label_tag }}
+                        {{ user_form.username }}
+                        {{ user_form.username.errors }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        {{ user_form.password1.label_tag }}
+                        {{ user_form.password1 }}
+                        {{ user_form.password1.errors }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        {{ user_form.password2.label_tag }}
+                        {{ user_form.password2 }}
+                        {{ user_form.password2.errors }}
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-row">
+                <div class="col">
+                    <button type="submit">Envoyer</button>
+                </div>
+                <div class="col">
+                    <button type="button" onclick="window.location.href='/'">Annuler</button>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</body>
+</html>

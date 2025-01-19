@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription Enseignant</title>
+</head>
+<body>
+    <h1>Inscription Enseignant</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        {{ enseignant_form.as_p }}
+        <button type="submit">S'inscrire</button>
+    </form>
+</body>
+</html>

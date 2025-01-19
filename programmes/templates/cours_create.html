@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #abc4dc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            width: 400px;
+            background-color: #fff;
+            border: #2563eb solid ;
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #2563eb;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        button[type="button"] {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="button"]:hover {
+            background-color: #c82333;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Formulaire</h2>
+        {% load crispy_forms_tags %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit">Envoyer</button>
+            <button type="button" onclick="window.location.href='/'">Annuler</button>
+        </form>
+    </div>
+</body>
+</html>

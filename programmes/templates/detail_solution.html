@@ -1,0 +1,72 @@
+{% extends 'detail_cours.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% block nav %}
+    <nav>
+    {% if request.user.is_authenticated and request.user.eleve %}
+    <button id="convert-btn" class="custom-btn btn-2">Commencer la lecture</button>
+    {% endif %}
+        <button id="go-back-btn" class="go-back-btn">Retour</button>
+    <script>
+document.getElementById('go-back-btn').addEventListener('click', function() {
+    window.history.back();
+});
+</script>
+
+<script>
+var audio;
+var isPlaying = false;
+var isLoaded = false;
+
+document.getElementById('convert-btn').addEventListener('click', function() {
+    var button = this;
+
+    if (!isLoaded) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '{% url "convert_text_to_speech" Solution.slug %}', true);
+        xhr.responseType = 'blob';
+
+        xhr.onload = function(e) {
+            if (this.status == 200) {
+                var blob = this.response;
+                var url = URL.createObjectURL(blob);
+                audio = new Audio(url);
+                audio.play();
+                isPlaying = true;
+                isLoaded = true;
+                button.textContent = "Arrêter la lecture";
+                audio.onended = function() {
+                    isPlaying = false;
+                    button.textContent = "Commencer la lecture";
+                };
+            }
+        };
+
+        xhr.send();
+    } else {
+        if (!isPlaying) {
+            audio.play();
+            isPlaying = true;
+            button.textContent = "Arrêter la lecture";
+        } else {
+            audio.pause();
+            isPlaying = false;
+            button.textContent = "Continuer la lecture";
+        }
+    }
+});
+</script>
+</nav>
+{% endblock %}
+{% block header %}
+    <header>
+    <iframe src="{{ Solution.fichier.url }}" class="ifr"></iframe>
+</header>
+{% endblock %}
+</body>
+</html>

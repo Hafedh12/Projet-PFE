@@ -1,0 +1,256 @@
+{% extends 'detail_cours.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        {% block style_nav %}
+            {{ block.super }}
+            {% block btn %}
+                  .custom-btn{
+        justify-content: center;
+        margin-top: 3px;
+        margin-left: 18%;
+  width: 208px;
+  height: 40px;
+  color: #fff;
+  border-radius: 5px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5),
+   7px 7px 20px 0px rgba(0,0,0,.1),
+   4px 4px 5px 0px rgba(0,0,0,.1);
+  outline: none;
+  font-size: 15px;
+}
+                {% endblock %}
+            .str{
+            margin-left: 26%;
+            }
+    .btn {
+    box-shadow: 12px 17px 51px rgba(217, 103, 163, 0.84);
+    background-color: #c0cde5; /* Couleur de fond verte */
+    border: 0.25px solid; /* Pas de bordure */
+    color: white; /* Couleur du texte en blanc */
+    text-align: center; /* Alignement du texte au centre */
+    text-decoration: none; /* Pas de soulignement */
+    display: inline-block; /* Affichage en ligne */
+    cursor: pointer; /* Curseur en forme de main */
+    border-radius: 4px; /* Coins arrondis */
+    transition: background-color 0.3s ease; /* Transition de couleur de fond */
+    margin-left: 15px;
+    font-size: 18px;
+    padding: 8px 25px;
+    font-family: Arial;
+}
+.btn:hover {
+    background-color: #96abd9; /* Couleur de fond plus foncée au survol */
+}
+        {% endblock %}
+    {% block style_header %}
+
+         .tag {
+                    float: left;
+             margin-top: 5px;
+         margin-left: 20px;
+         }
+.ifr{
+    margin-left: 2px;
+    width: 695px;
+    height: 570px;
+    border: 2px solid;
+}
+         .custum-file-upload {
+height: 570px;
+         width: 680px;
+display: flex;
+flex-direction: column;
+align-items: space-between;
+gap: 20px;
+cursor: pointer;
+align-items: center;
+justify-content: center;
+border: 2px dashed #262020;
+background-color: #C0CDE5FF;
+padding: 1.5rem;
+border-radius: 10px;
+box-shadow: 0px 48px 35px -48px #e8e8e8;
+}
+
+.custum-file-upload .icon {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.custum-file-upload .icon svg {
+height: 80px;
+fill: #4c60af;
+}
+
+.custum-file-upload .text {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.custum-file-upload .text span {
+font-weight: 400;
+font-size: 30px;
+color: #4f7d9b;
+}
+
+.custum-file-upload input {
+display: none;
+}
+         table {
+        border: 2px solid;
+        width: 600px;
+        border-collapse: collapse;
+        font-size: 25px; /* Pour rendre le texte plus grand */
+    }
+    th, td {
+        border: 2px solid;
+        padding: 10px;
+        text-align: center;
+    }
+    tr:first-child {
+      font-weight: bold;
+        background-color: #968a8a; /* Arrière-plan gris pour la première ligne */
+    }
+         h3{
+         font-size: 30px;
+         display: flex;
+         margin-left: 2.25em;
+         margin-top: 1em;
+         }
+    {% endblock %}
+    </style>
+</head>
+<body>
+{% block nav %}
+    <nav>
+     {% if request.user.is_authenticated and request.user.eleve %}
+        <button id="convert-btn" class="custom-btn btn-2">Commancer la lecture</button>
+                     {% if status %}
+                         <span class="str">
+                    <a href="{% url 'status_update' status.slug  %}">
+                        <button type="button"  id="modf" class="btn">Modifier réponse</button>
+                    </a>
+                    <a href="{% url 'status_delete' status.slug %}" id="sup">
+                        <button type="button" id="sup" class="btn">Supprimer réponse</button>
+                    </a>
+                         </span>
+                         {% endif %}
+    {% endif %}
+    <a href="{% url 'Exercice_list' %}"><button id="go-back-btn" class="go-back-btn">Retour</button></a>
+<script>
+var audio;  // Déclarer une variable globale pour l'audio
+var isPlaying = false;  // État pour suivre si l'audio est en cours de lecture
+var isLoaded = false;  // État pour suivre si l'audio a été chargé
+
+document.getElementById('convert-btn').addEventListener('click', function() {
+    var button = this;
+    if (!isLoaded) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '{% url "convert_text_to_speech" exercice.slug %}', true);
+        xhr.responseType = 'blob';
+
+        xhr.onload = function(e) {
+            if (this.status == 200) {
+                var blob = this.response;
+                var url = URL.createObjectURL(blob);
+                audio = new Audio(url);
+                audio.play();
+                isPlaying = true;
+                isLoaded = true;
+                button.textContent = "Arrêter la lecture";
+                audio.onended = function() {
+                    isPlaying = false;
+                    button.textContent = "Commancer la lecture";
+                };
+            }
+        };
+
+        xhr.send();
+    } else {
+        if (!isPlaying) {
+            audio.play();
+            isPlaying = true;
+            button.textContent = "Arrêter la lecture";
+        } else {
+            audio.pause();
+            isPlaying = false;
+            button.textContent = "Continuer la lecture ";
+        }
+    }
+});
+</script>
+    </nav>
+{% endblock %}
+{% block header %}
+    <header>
+        <span class="tag">
+            <iframe src="{{ exercice.fichier.url }}" class="ifr"></iframe>
+        </span>
+        <span class="tag">
+            {% if request.user.is_authenticated and request.user.eleve %}
+            {% if not status %}
+                <a href="{% url 'status_create' exercice.slug %}" style="text-decoration: none">
+                    <button for="file" id="btnrep" class="custum-file-upload" >
+                        <div class="icon">
+                            <svg viewBox="0 0 24 24" fill="" xmlns="http://www.w3.org/2000/svg">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z" fill=""></path>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="text">
+                            <span>Télécharger votre réponse ici</span>
+                        </div>
+                    </button>
+                </a>
+            {% else %}
+                <iframe src="{{ status.fichier.url }}" class="ifr"></iframe>
+            {% endif %}
+        {% endif %}
+    </span>
+    <span class="tag">
+    {% if request.user.is_authenticated and request.user.enseignant %}
+        {% if not all_status %}
+                <h3>Aucune réponse n’existe pour le moment.</h3>
+            {% else %}
+            <table>
+                    <tr>
+                        <td>Nom d'utilisateur</td>
+                        <td>Prénom</td>
+                        <td>Nom</td>
+                        <td>Réponse</td>
+                    </tr>
+                    {% for stat in all_status %}
+                        <tr>
+                            <td>{{ stat.créer_par.username }}</td>
+                            <td>{{ stat.créer_par.first_name }}</td>
+                            <td>{{ stat.créer_par.last_name }}</td>
+                            <td>
+                                <a href="{{ stat.fichier.url }}" target="_blank">Voire réponse</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+            </table>
+            {% endif %}
+    {% endif %}
+    </span>
+    </header>
+{% endblock %}
+</body>
+</html>

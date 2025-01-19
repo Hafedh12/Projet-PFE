@@ -1,0 +1,103 @@
+{% extends 'liste_cours.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% block style_header %}
+    {{ block.super }}
+    {% endblock %}
+</head>
+<body>
+{% block header %}
+     {% if request.user.is_authenticated and request.user.enseignant %}
+        <a href="{% url 'exercice_create' %}">
+            <button class="button">
+                <span class="button_top">Ajouter un exercice</span>
+            </button>
+        </a>
+    {% endif %}
+    <header>
+    {% for Exercice in Exercices %}
+        {% if request.user.is_authenticated %}
+            {% if request.user.enseignant and Exercice.créer_par == request.user %}
+                <div class="card">
+                    <a href="{% url 'exercice_detail' slug=Exercice.slug %}" style="text-decoration: none; ">
+                        <div class="nomch">
+                            {{ Exercice.nom_exercice }}
+                        </div>
+                    </a><br>
+                    <a href="{% url 'exercice_update' slug=Exercice.slug %}">
+                        <button type="button" class="btn" id="modf">Modifier</button>
+                    </a>
+                    <a href="{% url 'exercice_delete' slug=Exercice.slug %}" id="sup">
+                        <button type="button" class="btn">Supprimer</button>
+                    </a>
+                </div>
+            {% elif not request.user.enseignant %}
+                <div class="card">
+                    <a href="{% url 'exercice_detail' slug=Exercice.slug %}" style="text-decoration: none; ">
+                        <div class="nomch">
+                            {{ Exercice.nom_exercice }}
+                        </div>
+                    </a><br>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</header>
+    {% if request.user.eleve %}
+    <button id="voice-command-btn">
+        <i class="fas fa-microphone"></i>
+    </button>
+    {% endif %}
+    <script>
+        document.getElementById('voice-command-btn').addEventListener('click', function() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'fr-FR';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = function() {
+                    console.log('Reconnaissance vocale activée');
+                };
+
+                recognition.onresult = function(event) {
+                    const command = event.results[0][0].transcript.toLowerCase();
+                    console.log('Commande vocale reçue:', command);
+                    handleVoiceCommand(command);
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Erreur de reconnaissance vocale:', event.error);
+                };
+
+                recognition.onend = function() {
+                    console.log('Reconnaissance vocale terminée');
+                };
+
+                recognition.start();
+            } else {
+                alert('La reconnaissance vocale n\'est pas supportée par votre navigateur.');
+            }
+        });
+
+        function handleVoiceCommand(command) {
+            const exercices = {{ exercice_dict|safe }};
+            const exerciceKey = Object.keys(exercices).find(key => command.includes(key));
+            if (exerciceKey) {
+                window.location.href = exercices[exerciceKey];
+            } else if (command.includes('retour')) {
+            console.log('retour');
+            window.location.href = "{% url 'home' %}";
+            }
+            else {
+                alert('Commande non reconnue. Essayez "inscription", "accueil", "login", "profile", ou le nom d\'un cours.');
+            }
+        }
+    </script>
+{% endblock %}
+</body>
+</html>

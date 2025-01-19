@@ -1,0 +1,108 @@
+{% extends 'liste_exercice.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% block header %}
+     {% if request.user.is_authenticated and request.user.enseignant %}
+        <a href="{% url 'solution_create' %}">
+            <button class="button">
+                <span class="button_top">Ajouter une solution</span>
+            </button>
+        </a>
+    {% endif %}
+    <header>
+    {% for Solution in Solutions %}
+        {% if request.user.is_authenticated %}
+            {% if request.user.enseignant and Solution.créer_par == request.user %}
+                <div class="card">
+                    <a href="{% url 'detail_solution' slug=Solution.slug %}" style="text-decoration: none; ">
+                        <div class="nomch">
+                          Solution  {{ Solution.exercice }}
+                        </div>
+                    </a><br>
+                    <a href="{% url 'solution_update' slug=Solution.slug %}">
+                        <button type="button" class="btn" id="modf">Modifier</button>
+                    </a>
+                    <a href="{% url 'solution_delete' slug=Solution.slug %}" id="sup">
+                        <button type="button" class="btn">Supprimer</button>
+                    </a>
+                </div>
+            {% elif request.user.eleve %}
+                {% if Solution.is_expired %}
+                    <div class="card">
+                        <a href="{% url 'detail_solution' slug=Solution.slug %}" style="text-decoration: none;">
+                            <div class="nomch">
+                                Solution {{ Solution.exercice }}
+                            </div>
+                        </a><br>
+                    </div>
+                {% else %}
+                    <div class="card">
+                        <div class="nomch">
+                            La solution {{ Solution.exercice }} n'est pas disponible.
+                        </div><br>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</header>
+    {% if request.user.is_authenticated and request.user.eleve %}
+<button id="voice-command-btn">
+        <i class="fas fa-microphone"></i>
+    </button>
+    {% endif %}
+
+    <script>
+        document.getElementById('voice-command-btn').addEventListener('click', function() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'fr-FR';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = function() {
+                    console.log('Reconnaissance vocale activée');
+                };
+
+                recognition.onresult = function(event) {
+                    const command = event.results[0][0].transcript.toLowerCase().trim();
+                    console.log('Commande vocale reçue:', command);
+                    handleVoiceCommand(command);
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Erreur de reconnaissance vocale:', event.error);
+                };
+
+                recognition.onend = function() {
+                    console.log('Reconnaissance vocale terminée');
+                };
+
+                recognition.start();
+            } else {
+                alert('La reconnaissance vocale n\'est pas supportée par votre navigateur.');
+            }
+        });
+
+        function handleVoiceCommand(command) {
+            const solutions = {{ solution_dict|safe }};
+            const solutionKey = Object.keys(solutions).find(key => command.includes(key));
+            if (solutionKey) {
+                window.location.href = solutions[solutionKey];
+            }else if (command.includes('retour')) {
+            console.log('retour');
+            window.location.href = "{% url 'home' %}";
+            }
+            else {
+                alert('Commande non reconnue. Essayez le nom d\'un exercice.');
+            }
+        }
+    </script>
+{% endblock %}
+</body>
+</html>

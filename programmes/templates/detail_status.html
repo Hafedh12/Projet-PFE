@@ -1,0 +1,16 @@
+{% extends 'detail_cours.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% block header %}
+    <header>
+    <iframe src="{{ Status.fichier.url }} Exercice.slug" class="ifr"></iframe>
+
+</header>
+{% endblock %}
+</body>
+</html>
